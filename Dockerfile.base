@@ -1,0 +1,17 @@
+FROM golang:1.25rc2-bookworm AS build
+
+RUN go install github.com/anyproto/any-sync-tools/any-sync-network@latest
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl yq ca-certificates
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+RUN sh /uv-installer.sh && rm /uv-installer.sh
+ENV PATH="/root/.local/bin/:$PATH"
+
+COPY . .
+RUN uv sync --locked
+RUN uv run make_template.py
+
+RUN any-sync-network create --auto
+RUN yq -iy '.storage.anyStorePath = "/anyStorage"' etc/any-sync-node-1/config.yml && \
+    yq -iy '.storage.anyStorePath = "/anyStorage"' etc/any-sync-node-2/config.yml && \
+    yq -iy '.storage.anyStorePath = "/anyStorage"' etc/any-sync-node-3/config.yml

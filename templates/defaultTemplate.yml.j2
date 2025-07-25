@@ -1,0 +1,53 @@
+external-addresses:
+  {% for addr in EXTERNAL_LISTEN_HOSTS.split(" ") %}
+    - {{ addr }}
+  {% endfor %}
+
+any-sync-coordinator:
+  listen: {{ ANY_SYNC_COORDINATOR_HOST }}
+  yamuxPort: {{ ANY_SYNC_COORDINATOR_PORT }}
+  quicPort: {{ ANY_SYNC_COORDINATOR_QUIC_PORT }}
+  mongo:
+    connect: {{ MONGO_URL }}
+    database: coordinator
+  defaultLimits:
+    spaceMembersRead: {{ ANY_SYNC_COORDINATOR_DEFAULT_LIMITS_SPACE_MEMBERS_READ }}
+    spaceMembersWrite: {{ ANY_SYNC_COORDINATOR_DEFAULT_LIMITS_SPACE_MEMBERS_WRITE }}
+    sharedSpacesLimit: {{ ANY_SYNC_COORDINATOR_DEFAULT_LIMITS_SHARED_SPACES_LIMIT }}
+
+any-sync-consensusnode:
+  listen: {{ ANY_SYNC_CONSENSUSNODE_HOST }}
+  yamuxPort: {{ ANY_SYNC_CONSENSUSNODE_PORT }}
+  quicPort: {{ ANY_SYNC_CONSENSUSNODE_QUIC_PORT }}
+  mongo:
+    connect: {{ MONGO_URL }}
+    database: consensus
+
+any-sync-filenode:
+  listen: {{ ANY_SYNC_FILENODE_HOST }}
+  yamuxPort: {{ ANY_SYNC_FILENODE_PORT }}
+  quicPort: {{ ANY_SYNC_FILENODE_QUIC_PORT }}
+  s3Store:
+    endpoint: {{ MINIO_URL }}
+    bucket: {{ MINIO_BUCKET }}
+    indexBucket: {{ MINIO_BUCKET }} 
+    region: us-east-1
+    profile: default
+    forcePathStyle: true
+  redis:
+    url: {{ REDIS_URL }}
+  defaultLimit: {{ ANY_SYNC_FILENODE_DEFAULT_LIMIT }}
+
+any-sync-node:
+  listen:
+    - {{ ANY_SYNC_NODE_1_HOST }}
+    - {{ ANY_SYNC_NODE_2_HOST }}
+    - {{ ANY_SYNC_NODE_3_HOST }}
+  yamuxPort:
+    - {{ ANY_SYNC_NODE_1_PORT }}
+    - {{ ANY_SYNC_NODE_2_PORT }}
+    - {{ ANY_SYNC_NODE_3_PORT }}
+  quicPort:
+    - {{ ANY_SYNC_NODE_1_QUIC_PORT }}
+    - {{ ANY_SYNC_NODE_2_QUIC_PORT }}
+    - {{ ANY_SYNC_NODE_3_QUIC_PORT }}
