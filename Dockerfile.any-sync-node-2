@@ -1,4 +1,4 @@
 FROM ghcr.io/anyproto/any-sync-node:latest
 
-copy --from=any-sync-base:latest /go/etc/any-sync-node-2/config.yml /etc/any-sync-node/config.yml
+copy --from=localhost/any-sync-base:latest /go/etc/any-sync-node-2/config.yml /etc/any-sync-node/config.yml
 

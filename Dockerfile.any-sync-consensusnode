@@ -1,3 +1,3 @@
 FROM ghcr.io/anyproto/any-sync-consensusnode:latest
 
-copy --from=any-sync-base:latest /go/etc/any-sync-consensusnode/config.yml /etc/any-sync-consensusnode/config.yml
+copy --from=localhost/any-sync-base:latest /go/etc/any-sync-consensusnode/config.yml /etc/any-sync-consensusnode/config.yml
