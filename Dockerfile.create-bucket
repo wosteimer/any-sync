@@ -1,7 +1,5 @@
 FROM minio/mc:RELEASE.2025-07-21T05-28-08Z-cpuv1 
 
-COPY create_bucket.sh .
+copy create_bucket.sh .
 
-RUN chmod +X create_bucket.sh
-
-ENTRYPOINT ["sh", "/create_bucket.sh"]
+entrypoint ["bash", "/create_bucket.sh"]

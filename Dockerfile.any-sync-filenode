@@ -1,3 +1,0 @@
-FROM ghcr.io/anyproto/any-sync-filenode:latest
-
-copy --from=localhost/any-sync-base:latest /go/etc/any-sync-filenode/config.yml /etc/any-sync-filenode/config.yml

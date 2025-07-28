@@ -52,11 +52,23 @@ services:
     depends_on:
       minio:
         condition: service_healthy
+  
+  create_config:
+    build:
+      context: .
+      dockerfile: Dockerfile.create-config
+    volumes:
+      - config-etc:/go/etc
+      - any-sync-node-1-etc:/go/etc/any-sync-node-1
+      - any-sync-node-2-etc:/go/etc/any-sync-node-2
+      - any-sync-node-3-etc:/go/etc/any-sync-node-3
+      - any-sync-coordinator-etc:/go/etc/any-sync-coordinator
+      - any-sync-consensusnode-etc:/go/etc/any-sync-consensusnode
+      - any-sync-filenode-etc:/go/etc/any-sync-filenode
+
 
   any-sync-node-1:
-      build:
-        context: .
-        dockerfile: Dockerfile.any-sync-node-1
+      image: ghcr.io/anyproto/any-sync-node:latest
       ports:
         - ${ANY_SYNC_NODE_1_PORT}:${ANY_SYNC_NODE_1_PORT} 
         - ${ANY_SYNC_NODE_1_QUIC_PORT}:${ANY_SYNC_NODE_1_QUIC_PORT} 
@@ -67,12 +79,11 @@ services:
         - any-sync-node-1-networkStore:/networkStore
         - any-sync-node-1-anyStorage:/anyStorage
         - any-sync-node-1-storage:/storage
+        - any-sync-node-1-etc:/etc/any-sync-node
       restart: unless-stopped
 
   any-sync-node-2:
-      build:
-        context: .
-        dockerfile: Dockerfile.any-sync-node-2
+      image: ghcr.io/anyproto/any-sync-node:latest
       ports:
         - ${ANY_SYNC_NODE_2_PORT}:${ANY_SYNC_NODE_2_PORT} 
         - ${ANY_SYNC_NODE_2_QUIC_PORT}:${ANY_SYNC_NODE_2_QUIC_PORT} 
@@ -83,12 +94,11 @@ services:
         - any-sync-node-2-networkStore:/networkStore
         - any-sync-node-2-anyStorage:/anyStorage
         - any-sync-node-2-storage:/storage
+        - any-sync-node-2-etc:/etc/any-sync-node
       restart: unless-stopped
 
   any-sync-node-3:
-      build:
-        context: .
-        dockerfile: Dockerfile.any-sync-node-3
+      image: ghcr.io/anyproto/any-sync-node:latest
       ports:
         - ${ANY_SYNC_NODE_3_PORT}:${ANY_SYNC_NODE_3_PORT} 
         - ${ANY_SYNC_NODE_3_QUIC_PORT}:${ANY_SYNC_NODE_3_QUIC_PORT} 
@@ -99,31 +109,32 @@ services:
         - any-sync-node-3-networkStore:/networkStore
         - any-sync-node-3-anyStorage:/anyStorage
         - any-sync-node-3-storage:/storage
+        - any-sync-node-3-etc:/etc/any-sync-node
       restart: unless-stopped
 
   any-sync-coordinator:
-      build:
-        context: .
-        dockerfile: Dockerfile.any-sync-coordinator
+      image: ghcr.io/anyproto/any-sync-coordinator:latest
       ports:
         - ${ANY_SYNC_COORDINATOR_PORT}:${ANY_SYNC_COORDINATOR_PORT} 
         - ${ANY_SYNC_COORDINATOR_QUIC_PORT}:${ANY_SYNC_COORDINATOR_QUIC_PORT} 
       volumes:
         - "any-sync-coordinator-networkStore:/networkStore"
+        - any-sync-coordinator-etc:/etc/any-sync-coordinator
       depends_on:
+        create_config:
+          condition: service_completed_successfully
         mongo:
           condition: service_healthy 
       restart: unless-stopped
 
   any-sync-consensusnode:
-      build:
-        context: .
-        dockerfile: Dockerfile.any-sync-consensusnode
+      image: ghcr.io/anyproto/any-sync-consensusnode:latest
       ports:
         - ${ANY_SYNC_CONSENSUSNODE_PORT}:${ANY_SYNC_CONSENSUSNODE_PORT} 
         - ${ANY_SYNC_CONSENSUSNODE_QUIC_PORT}:${ANY_SYNC_CONSENSUSNODE_QUIC_PORT} 
       volumes:
         - "any-sync-consensusnode-networkStore:/networkStore"
+        - any-sync-consensusnode-etc:/etc/any-sync-consensusnode
       depends_on:
         mongo:
           condition: service_healthy 
@@ -132,15 +143,14 @@ services:
       restart: unless-stopped
 
   any-sync-filenode:
-      build:
-        context: .
-        dockerfile: Dockerfile.any-sync-filenode
+      image: ghcr.io/anyproto/any-sync-filenode:latest
       ports:
         - ${ANY_SYNC_FILENODE_PORT}:${ANY_SYNC_FILENODE_PORT} 
         - ${ANY_SYNC_FILENODE_QUIC_PORT}:${ANY_SYNC_FILENODE_QUIC_PORT} 
       volumes:
         - "any-sync-filenode-networkStore:/networkStore"
         - "any-sync-filenode-aws:/root/.aws:ro" 
+        - any-sync-filenode-etc:/etc/any-sync-filenode
       depends_on:
         redis:
           condition: service_healthy
@@ -151,6 +161,13 @@ services:
       restart: unless-stopped
 
 volumes:
+  config-etc:
+  any-sync-node-1-etc:
+  any-sync-node-2-etc:
+  any-sync-node-3-etc:
+  any-sync-coordinator-etc:
+  any-sync-consensusnode-etc:
+  any-sync-filenode-etc:
   any-sync-filenode-aws:
   any-sync-filenode-networkStore:
   any-sync-consensusnode-networkStore:

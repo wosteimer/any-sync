@@ -1,3 +1,0 @@
-FROM ghcr.io/anyproto/any-sync-coordinator:latest
-
-copy --from=localhost/any-sync-base:latest /go/etc/any-sync-coordinator/config.yml /etc/any-sync-coordinator/config.yml

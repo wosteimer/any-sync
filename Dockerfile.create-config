@@ -9,9 +9,5 @@ ENV PATH="/root/.local/bin/:$PATH"
 
 COPY . .
 RUN uv sync --locked
-RUN uv run make_template.py
 
-RUN any-sync-network create --auto
-RUN yq -iy '.storage.anyStorePath = "/anyStorage"' etc/any-sync-node-1/config.yml && \
-    yq -iy '.storage.anyStorePath = "/anyStorage"' etc/any-sync-node-2/config.yml && \
-    yq -iy '.storage.anyStorePath = "/anyStorage"' etc/any-sync-node-3/config.yml
+ENTRYPOINT ["bash", "create_config.sh"]
